@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickBill — Dynamic Invoice & Receipt Maker</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231a73e8%22/><text x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 fill=%22%23ffffff%22 font-family=%22sans-serif%22 font-size=%2255%22 font-weight=%22bold%22>$</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="carbon">
+  <main class="app-wrapper">
+    <!-- Top Workspace Toolbar (Hidden on Print) -->
+    <section class="workspace-bar no-print" aria-label="Workspace theme and controls">
+      <div class="workspace-brand">
+        <span class="dot blue"></span>
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+        <span class="workspace-title">QuickBill Studio</span>
+      </div>
+      <div class="theme-group">
+        <span class="theme-label">Theme</span>
+        <div class="theme-toggles" id="theme-toggles">
+          <button type="button" data-theme="light">Material</button>
+          <button type="button" data-theme="carbon" class="active">Carbon</button>
+          <button type="button" data-theme="nord">Nord</button>
+          <button type="button" data-theme="emerald">Emerald</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Invoice Document Card -->
+    <article class="invoice-card" id="invoice-card">
+      <!-- Invoice Header -->
+      <header class="invoice-header">
+        <div class="company-block">
+          <h1>INVOICE</h1>
+          <p class="company-sub">Official Tax Receipt & Billing Summary</p>
+        </div>
+        <div class="status-badge">TAX INVOICE</div>
+      </header>
+
+      <!-- Customer & Invoice Metadata Fields -->
+      <section class="metadata-grid" aria-label="Customer and invoice details">
+        <div class="field-group">
+          <label for="customer-name">Customer Name</label>
+          <input 
+            type="text" 
+            id="customer-name" 
+            placeholder="e.g., Acme Corp / Rahul Nair" 
+            autocomplete="off"
+          >
+        </div>
+        <div class="field-group">
+          <label for="invoice-date">Invoice Date</label>
+          <input type="date" id="invoice-date">
+        </div>
+        <div class="field-group">
+          <label for="invoice-number">Invoice #</label>
+          <input 
+            type="text" 
+            id="invoice-number" 
+            placeholder="INV-2026-001" 
+            autocomplete="off"
+          >
+        </div>
+      </section>
+
+      <!-- Item Addition Form (Hidden on Print) -->
+      <form id="item-form" class="input-form no-print" novalidate>
+        <div class="form-row">
+          <div class="field-group flex-grow">
+            <label for="item-name">Item Description</label>
+            <input 
+              type="text" 
+              id="item-name" 
+              placeholder="e.g., Full-Stack UI Architecture" 
+              required
+              autocomplete="off"
+            >
+          </div>
+          <div class="field-group field-sm">
+            <label for="item-qty">Quantity</label>
+            <input 
+              type="number" 
+              id="item-qty" 
+              placeholder="1" 
+              min="0.01" 
+              step="any" 
+              required
+            >
+          </div>
+          <div class="field-group field-md">
+            <label for="item-price">Unit Price ($)</label>
+            <input 
+              type="number" 
+              id="item-price" 
+              placeholder="0.00" 
+              min="0.01" 
+              step="any" 
+              required
+            >
+          </div>
+          <div class="field-group field-btn">
+            <button type="submit" id="add-item-btn" class="btn-add">
+              + Add Item
+            </button>
+          </div>
+        </div>
+        <p id="form-error" class="form-error" role="alert" aria-live="polite"></p>
+      </form>
+
+      <!-- Dynamic Line Items Table -->
+      <section class="table-container" aria-label="Invoice Line Items">
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th class="col-index">#</th>
+              <th class="col-desc">Item Description</th>
+              <th class="col-qty num-col">Qty</th>
+              <th class="col-price num-col">Unit Price</th>
+              <th class="col-total num-col">Line Total</th>
+              <th class="col-action delete-col no-print">Action</th>
+            </tr>
+          </thead>
+          <tbody id="invoice-tbody">
+            <!-- Dynamically populated by script.js from the items[] array -->
+          </tbody>
+        </table>
+        <div id="empty-state" class="empty-state">
+          No items added to this invoice yet. Use the form above to add billable items.
+        </div>
+      </section>
+
+      <!-- Summary & Reduction Math Footer -->
+      <footer class="invoice-footer">
+        <div class="invoice-notes">
+          <p class="notes-title">Payment Terms & Notes</p>
+          <p class="notes-body">Thank you for your business. All amounts are calculated dynamically with standard 18% GST/Tax applied.</p>
+        </div>
+
+        <div class="totals-panel">
+          <div class="totals-row">
+            <span>Subtotal</span>
+            <span id="subtotal-amount" class="currency-badge">$0.00</span>
+          </div>
+          <div class="totals-row">
+            <span>Tax (18% GST)</span>
+            <span id="tax-amount" class="currency-badge">$0.00</span>
+          </div>
+          <div class="totals-row grand-total-row">
+            <span>Grand Total</span>
+            <span id="grand-total" class="currency-badge grand-badge">$0.00</span>
+          </div>
+        </div>
+      </footer>
+
+      <!-- Action Buttons (Hidden on Print) -->
+      <div class="action-btns no-print">
+        <button type="button" id="clear-btn" class="btn-secondary">
+          Clear All
+        </button>
+        <button type="button" id="print-btn" class="btn-primary">
+          Print Invoice / Save PDF
+        </button>
+      </div>
+    </article>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,559 @@
+/* Theme Palettes */
+body[data-theme="light"] {
+  --bg-page: #f1f3f4;
+  --bg-card: #ffffff;
+  --bg-elevated: #f8f9fa;
+  --bg-zebra: #f8fafd;
+  --text-main: #202124;
+  --text-muted: #5f6368;
+  --border-color: #dadce0;
+  --accent: #1a73e8;
+  --accent-hover: #1557b0;
+  --accent-soft: rgba(26, 115, 232, 0.1);
+  --danger: #dc2626;
+  --danger-bg: #fee2e2;
+  --danger-hover: #b91c1c;
+  --shadow: 0 4px 20px rgba(60, 64, 67, 0.08), 0 1px 3px rgba(60, 64, 67, 0.06);
+}
+
+body[data-theme="carbon"] {
+  --bg-page: #181825;
+  --bg-card: #1e1e2e;
+  --bg-elevated: #262639;
+  --bg-zebra: #232334;
+  --text-main: #cdd6f4;
+  --text-muted: #9399b2;
+  --border-color: #313244;
+  --accent: #89b4fa;
+  --accent-hover: #b4befe;
+  --accent-soft: rgba(137, 180, 250, 0.14);
+  --danger: #f38ba8;
+  --danger-bg: rgba(243, 139, 168, 0.15);
+  --danger-hover: #eba0ac;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+body[data-theme="nord"] {
+  --bg-page: #242933;
+  --bg-card: #2e3440;
+  --bg-elevated: #3b4252;
+  --bg-zebra: #353c4a;
+  --text-main: #eceff4;
+  --text-muted: #9aa5b8;
+  --border-color: #434c5e;
+  --accent: #88c0d0;
+  --accent-hover: #8fbcbb;
+  --accent-soft: rgba(136, 192, 208, 0.15);
+  --danger: #bf616a;
+  --danger-bg: rgba(191, 97, 106, 0.2);
+  --danger-hover: #d08770;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+body[data-theme="emerald"] {
+  --bg-page: #0f1715;
+  --bg-card: #16221f;
+  --bg-elevated: #1e2e2a;
+  --bg-zebra: #1a2824;
+  --text-main: #ecfdf5;
+  --text-muted: #86a89d;
+  --border-color: #283e38;
+  --accent: #34d399;
+  --accent-hover: #6ee7b7;
+  --accent-soft: rgba(52, 211, 153, 0.14);
+  --danger: #fb7185;
+  --danger-bg: rgba(251, 113, 133, 0.16);
+  --danger-hover: #fda4af;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Base Reset & Typography */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  min-height: 100vh;
+  padding: 28px 16px;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.app-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Top Workspace Toolbar */
+.workspace-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px 18px;
+  box-shadow: var(--shadow);
+}
+
+.workspace-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.dot.blue { background-color: #4285f4; }
+.dot.red { background-color: #ea4335; }
+.dot.yellow { background-color: #fbbc05; }
+.dot.green { background-color: #34a853; }
+
+.workspace-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-left: 6px;
+  letter-spacing: -0.01em;
+}
+
+.theme-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.theme-toggles {
+  display: flex;
+  background-color: var(--bg-page);
+  padding: 3px;
+  border-radius: 8px;
+  gap: 2px;
+}
+
+.theme-toggles button {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.theme-toggles button.active {
+  background-color: var(--accent);
+  color: var(--bg-page);
+}
+
+/* Main Invoice Card */
+.invoice-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 36px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 20px;
+}
+
+.company-block h1 {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-main);
+}
+
+.company-sub {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.status-badge {
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+/* Metadata & Input Grids */
+.metadata-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 16px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-group label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.field-group input {
+  background-color: var(--bg-elevated);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.925rem;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* Item Addition Form */
+.input-form {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.flex-grow { flex: 1; }
+.field-sm { width: 110px; }
+.field-md { width: 150px; }
+
+.btn-add {
+  background-color: var(--accent);
+  color: var(--bg-page);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  height: 40px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn-add:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-add:active {
+  transform: translateY(1px);
+}
+
+.form-error {
+  color: var(--danger);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 8px;
+  min-height: 1.1em;
+}
+
+/* Table Styling */
+.table-container {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.invoice-table th {
+  background-color: var(--bg-elevated);
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.invoice-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.925rem;
+}
+
+/* Zebra-Striped Rows */
+.invoice-table tbody tr:nth-child(even) {
+  background-color: var(--bg-zebra);
+}
+
+.invoice-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.col-index { width: 48px; color: var(--text-muted); }
+.num-col {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.col-action {
+  width: 90px;
+  text-align: center;
+}
+
+/* Red Delete Button with Distinct Hover State */
+.delete-btn {
+  background-color: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.delete-btn:hover {
+  background-color: var(--danger);
+  color: #ffffff;
+}
+
+.empty-state {
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.empty-state.hidden {
+  display: none;
+}
+
+/* Dual-Column Split Summary Footer */
+.invoice-footer {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+  align-items: start;
+  padding-top: 8px;
+}
+
+.invoice-notes {
+  color: var(--text-muted);
+  font-size: 0.825rem;
+  line-height: 1.5;
+}
+
+.notes-title {
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.totals-panel {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.totals-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.925rem;
+  color: var(--text-muted);
+}
+
+.currency-badge {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-weight: 600;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+
+.grand-total-row {
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.grand-badge {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+/* Action Controls */
+.action-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+}
+
+.btn-primary,
+.btn-secondary {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 11px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: var(--bg-page);
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 720px) {
+  .invoice-card {
+    padding: 20px;
+  }
+  .metadata-grid,
+  .invoice-footer {
+    grid-template-columns: 1fr;
+  }
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .field-sm,
+  .field-md {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   CSS @media print: Zero-Library Clean A4 PDF Export
+   ========================================================================== */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    padding: 0 !important;
+  }
+
+  .no-print,
+  .input-form,
+  .action-btns,
+  .delete-col {
+    display: none !important;
+  }
+
+  .app-wrapper {
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .invoice-card {
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .field-group input {
+    background: transparent !important;
+    color: #000 !important;
+    border: none !important;
+    padding: 2px 0 !important;
+    font-weight: 600;
+  }
+
+  .invoice-table th,
+  .invoice-table td,
+  .totals-panel,
+  .table-container {
+    background: #fff !important;
+    color: #000 !important;
+    border-color: #ccc !important;
+  }
+
+  .currency-badge,
+  .grand-badge,
+  .company-block h1,
+  .notes-title {
+    color: #000 !important;
+  }
+
+  .status-badge {
+    border-color: #000 !important;
+    color: #000 !important;
+    background: transparent !important;
+  }
+}
