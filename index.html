@@ -1,171 +1,810 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="material">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuickBill — Dynamic Invoice & Receipt Maker</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231a73e8%22/><text x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 fill=%22%23ffffff%22 font-family=%22sans-serif%22 font-size=%2255%22 font-weight=%22bold%22>$</text></svg>">
+  <title>QuickBill — Professional GST Invoice &amp; Receipt Studio</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body data-theme="carbon">
-  <main class="app-wrapper">
-    <!-- Top Workspace Toolbar (Hidden on Print) -->
-    <section class="workspace-bar no-print" aria-label="Workspace theme and controls">
-      <div class="workspace-brand">
-        <span class="dot blue"></span>
-        <span class="dot red"></span>
-        <span class="dot yellow"></span>
-        <span class="dot green"></span>
-        <span class="workspace-title">QuickBill Studio</span>
+<body data-theme="material">
+
+  <!-- Top Application Command Bar (Hidden in Print) -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 28 28" width="24" height="24" fill="none">
+          <rect x="3" y="2.5" width="16" height="22" rx="2.5" stroke="currentColor" stroke-width="2"/>
+          <path d="M7.5 8.5h7M7.5 13h7M7.5 17.5h4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="20.5" cy="20.5" r="5" fill="var(--accent-seal)"/>
+          <path d="M18.6 20.5l1.3 1.3 2.5-2.6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
-      <div class="theme-group">
-        <span class="theme-label">Theme</span>
-        <div class="theme-toggles" id="theme-toggles">
-          <button type="button" data-theme="light">Material</button>
-          <button type="button" data-theme="carbon" class="active">Carbon</button>
-          <button type="button" data-theme="nord">Nord</button>
-          <button type="button" data-theme="emerald">Emerald</button>
+      <div class="brand-text">
+        <div class="brand-title-row">
+          <span class="brand-name">QuickBill</span>
+          <span class="brand-badge">GST PRO</span>
+          <span id="header-doc-badge" class="doc-status-chip">DRAFT</span>
+        </div>
+        <p class="brand-sub">Precision Invoice, Tax &amp; Receipt Ledger</p>
+      </div>
+    </div>
+
+    <!-- Live 4-Theme Switcher -->
+    <div class="theme-switcher-wrap">
+      <span class="theme-label">Theme</span>
+      <div class="theme-switcher" role="group" aria-label="Workspace Theme Selector">
+        <button type="button" class="theme-btn is-active" data-theme="material" aria-pressed="true" title="Material — Warm Swiss Ledger">
+          <span class="theme-dot dot-material"></span>
+          <span>Material</span>
+        </button>
+        <button type="button" class="theme-btn" data-theme="carbon" aria-pressed="false" title="Carbon — Dark Anodized Hardware">
+          <span class="theme-dot dot-carbon"></span>
+          <span>Carbon</span>
+        </button>
+        <button type="button" class="theme-btn" data-theme="nord" aria-pressed="false" title="Nord — Polar Night Slate">
+          <span class="theme-dot dot-nord"></span>
+          <span>Nord</span>
+        </button>
+        <button type="button" class="theme-btn" data-theme="emerald" aria-pressed="false" title="Emerald — Botanical Reserve">
+          <span class="theme-dot dot-emerald"></span>
+          <span>Emerald</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Primary Workspace Actions -->
+    <div class="header-actions">
+      <button type="button" id="btn-sample" class="btn btn-ghost" title="Populate a realistic GST sample invoice">
+        <svg viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true"><path d="M10 3v14M3 10h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span>Load Sample</span>
+      </button>
+
+      <button type="button" id="btn-save-vault" class="btn btn-secondary" title="Save snapshot to Invoice Vault">
+        <svg viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true"><path d="M4 3.5h9.5L16.5 6.5V16a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 3.5v4.5h6V3.5M6.5 17v-5h7v5" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Save</span>
+      </button>
+
+      <button type="button" id="btn-open-vault" class="btn btn-secondary" title="Open Saved Invoices &amp; Client Directory">
+        <svg viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true"><rect x="3" y="4" width="14" height="12" rx="1.8" stroke="currentColor" stroke-width="1.6"/><path d="M3 8.5h14M8 12h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span>Vault</span>
+        <span id="vault-count" class="count-pill">0</span>
+      </button>
+
+      <div class="btn-group-compact" role="group" aria-label="Import and Export">
+        <button type="button" id="btn-export-csv" class="btn btn-ghost btn-sm" title="Export line items as CSV">CSV</button>
+        <button type="button" id="btn-export-json" class="btn btn-ghost btn-sm" title="Export full invoice as JSON">JSON</button>
+        <button type="button" id="btn-import-json" class="btn btn-ghost btn-sm" title="Import invoice from JSON file">Import</button>
+        <input type="file" id="import-file-input" accept="application/json,.json" hidden>
+      </div>
+
+      <button type="button" id="btn-clear-all" class="btn btn-danger-outline" title="Reset invoice metadata and clear all items">
+        <svg viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true"><path d="M4.5 6h11M8 6V4.2a.7.7 0 0 1 .7-.7h2.6a.7.7 0 0 1 .7.7V6m-5.5 0l.6 9.8a1 1 0 0 0 1 .9h3.8a1 1 0 0 0 1-.9L13.5 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span>Clear All</span>
+      </button>
+
+      <button type="button" id="btn-print" class="btn btn-primary" title="Print or Export A4 PDF">
+        <svg viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true"><path d="M6 7V3.5h8V7M5.5 14H4a1.5 1.5 0 0 1-1.5-1.5v-4A1.5 1.5 0 0 1 4 7h12a1.5 1.5 0 0 1 1.5 1.5v4A1.5 1.5 0 0 1 16 14h-1.5" stroke="currentColor" stroke-width="1.6"/><rect x="6" y="11.5" width="8" height="5.5" rx=".8" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Print / Save as PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Live Financial Telemetry Ribbon (Hidden in Print) -->
+  <section class="telemetry-bar" aria-label="Live Invoice Telemetry">
+    <div class="telemetry-item">
+      <span class="telemetry-label">Grand Total</span>
+      <strong id="kpi-grand-total" class="telemetry-value">₹0.00</strong>
+    </div>
+    <div class="telemetry-item">
+      <span class="telemetry-label">Tax Liability</span>
+      <strong id="kpi-gst-total" class="telemetry-value">₹0.00</strong>
+    </div>
+    <div class="telemetry-item">
+      <span class="telemetry-label">Line Items</span>
+      <strong id="kpi-item-count" class="telemetry-value">0</strong>
+    </div>
+    <div class="telemetry-item">
+      <span class="telemetry-label">Vault Billed Total</span>
+      <strong id="kpi-vault-revenue" class="telemetry-value">₹0.00</strong>
+    </div>
+  </section>
+
+  <!-- Main Workspace -->
+  <main class="workspace" id="workspace-root">
+
+    <!-- Left Studio Control Panel (Hidden in Print) -->
+    <aside class="control-studio" aria-label="Invoice Builder Controls">
+      <nav class="studio-tabs" role="tablist" aria-label="Studio Sections">
+        <button type="button" class="studio-tab is-active" role="tab" aria-selected="true" data-tab="tab-core">Invoice &amp; Items</button>
+        <button type="button" class="studio-tab" role="tab" aria-selected="false" data-tab="tab-parties">Parties &amp; Tax</button>
+        <button type="button" class="studio-tab" role="tab" aria-selected="false" data-tab="tab-payment">Payment &amp; Sign</button>
+        <button type="button" class="studio-tab" role="tab" aria-selected="false" data-tab="tab-catalog">Catalog</button>
+      </nav>
+
+      <!-- TAB 1: INVOICE METADATA + ITEM ENTRY FORM -->
+      <div id="tab-core" class="studio-panel is-active" role="tabpanel">
+        <!-- Document Classification & Metadata -->
+        <section class="studio-card">
+          <div class="card-head">
+            <h2>Invoice Metadata</h2>
+            <span class="card-hint">Live Document Header</span>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="doc-type">Document Type</label>
+              <select id="doc-type">
+                <option value="TAX INVOICE">Tax Invoice</option>
+                <option value="PAYMENT RECEIPT">Payment Receipt</option>
+                <option value="PROFORMA INVOICE">Proforma Invoice</option>
+                <option value="ESTIMATE / QUOTE">Estimate / Quote</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="doc-stamp">Status Seal</label>
+              <select id="doc-stamp">
+                <option value="">None (Active)</option>
+                <option value="PAID">PAID</option>
+                <option value="DUE">PAYMENT DUE</option>
+                <option value="PARTIAL">PARTIALLY PAID</option>
+                <option value="VOID">VOID / CANCELLED</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="inv-number">Invoice Number</label>
+              <div class="input-with-btn">
+                <input type="text" id="inv-number" placeholder="QB-2026-0001" autocomplete="off">
+                <button type="button" id="btn-next-inv-num" class="inline-addon-btn" title="Auto-increment invoice number">+1</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="inv-date">Invoice Date</label>
+              <input type="date" id="inv-date">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="inv-terms">Payment Terms</label>
+              <select id="inv-terms">
+                <option value="Due on Receipt">Due on Receipt</option>
+                <option value="Net 7">Net 7 Days</option>
+                <option value="Net 15" selected>Net 15 Days</option>
+                <option value="Net 30">Net 30 Days</option>
+                <option value="Custom">Custom Date</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="inv-due-date">Due Date</label>
+              <input type="date" id="inv-due-date">
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="label-row">
+              <label for="customer-name">Customer Name</label>
+              <div class="label-actions">
+                <button type="button" id="btn-client-picker" class="text-link-btn">Saved Clients</button>
+                <button type="button" id="btn-save-client" class="text-link-btn">+ Save Client</button>
+              </div>
+            </div>
+            <input type="text" id="customer-name" list="saved-clients-datalist" placeholder="e.g., Arjun Mehta / Acme Tech Pvt. Ltd." autocomplete="off">
+            <datalist id="saved-clients-datalist"></datalist>
+          </div>
+        </section>
+
+        <!-- Item Management Form (Validated) -->
+        <section class="studio-card">
+          <div class="card-head">
+            <h2>Add Line Item</h2>
+            <span class="card-hint">Validated Entry</span>
+          </div>
+
+          <form id="item-form" novalidate>
+            <div class="field">
+              <label for="item-desc">Item Description <span class="req">*</span></label>
+              <input type="text" id="item-desc" placeholder="e.g., UI/UX Architecture &amp; Design System" autocomplete="off">
+              <p id="err-desc" class="field-error" role="alert" aria-live="polite"></p>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="field">
+                <label for="item-hsn">HSN / SAC <span class="opt">(Optional)</span></label>
+                <input type="text" id="item-hsn" placeholder="e.g., 998314" maxlength="12" autocomplete="off">
+              </div>
+              <div class="field">
+                <label for="item-unit">Unit</label>
+                <select id="item-unit">
+                  <option value="nos">nos</option>
+                  <option value="hrs">hrs</option>
+                  <option value="days">days</option>
+                  <option value="pcs">pcs</option>
+                  <option value="mo">month</option>
+                  <option value="lic">license</option>
+                  <option value="box">box</option>
+                  <option value="kg">kg</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="field">
+                <label for="item-qty">Quantity <span class="req">*</span></label>
+                <input type="number" id="item-qty" min="0.01" step="any" placeholder="1">
+                <p id="err-qty" class="field-error" role="alert" aria-live="polite"></p>
+              </div>
+              <div class="field">
+                <label for="item-price">Unit Price (₹) <span class="req">*</span></label>
+                <input type="number" id="item-price" min="0.01" step="any" placeholder="0.00">
+                <p id="err-price" class="field-error" role="alert" aria-live="polite"></p>
+              </div>
+            </div>
+
+            <div class="item-preview-strip">
+              <span>Calculated Line Total</span>
+              <strong id="item-live-preview">₹0.00</strong>
+            </div>
+
+            <div class="form-actions-row">
+              <button type="submit" id="btn-add-item" class="btn btn-primary btn-block">
+                <svg viewBox="0 0 20 20" width="15" height="15" fill="none" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                <span>Add Line Item</span>
+              </button>
+              <button type="button" id="btn-save-to-catalog" class="btn btn-secondary" title="Save item to Quick Catalog">
+                Save Preset
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Financial Adjustments -->
+        <section class="studio-card">
+          <div class="card-head">
+            <h2>Adjustments &amp; Receipts</h2>
+            <span class="card-hint">Optional Ledger Controls</span>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="adj-discount-val">Discount</label>
+              <div class="input-with-select">
+                <input type="number" id="adj-discount-val" min="0" step="any" value="0">
+                <select id="adj-discount-type" aria-label="Discount Type">
+                  <option value="flat">₹</option>
+                  <option value="percent">%</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="adj-shipping">Shipping / Misc (₹)</label>
+              <input type="number" id="adj-shipping" min="0" step="any" value="0">
+            </div>
+          </div>
+
+          <div class="form-grid-2 align-end">
+            <div class="field">
+              <label for="adj-paid">Amount Paid / Advance (₹)</label>
+              <input type="number" id="adj-paid" min="0" step="any" value="0">
+            </div>
+            <label class="checkbox-pill" for="adj-roundoff">
+              <input type="checkbox" id="adj-roundoff">
+              <span>Round-off to nearest ₹1</span>
+            </label>
+          </div>
+        </section>
+      </div>
+
+      <!-- TAB 2: SELLER, CLIENT DETAILS & TAX ENGINE -->
+      <div id="tab-parties" class="studio-panel" role="tabpanel" hidden>
+        <section class="studio-card">
+          <div class="card-head">
+            <h2>Your Business (Seller)</h2>
+            <span class="card-hint">Saved Automatically</span>
+          </div>
+
+          <div class="logo-uploader-row">
+            <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden>
+            <button type="button" id="btn-upload-logo" class="btn btn-secondary btn-sm">Upload Brand Logo</button>
+            <button type="button" id="btn-remove-logo" class="btn btn-ghost btn-sm">Reset Monogram</button>
+          </div>
+
+          <div class="field">
+            <label for="biz-name">Business / Legal Name</label>
+            <input type="text" id="biz-name" placeholder="QuickBill Digital Studio">
+          </div>
+          <div class="field">
+            <label for="biz-tagline">Tagline / Specialty</label>
+            <input type="text" id="biz-tagline" placeholder="Product Design &amp; Engineering Consultancy">
+          </div>
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="biz-gstin">Seller GSTIN</label>
+              <input type="text" id="biz-gstin" placeholder="27AAACQ1234F1Z5" maxlength="15">
+            </div>
+            <div class="field">
+              <label for="biz-state">Origin State</label>
+              <input type="text" id="biz-state" placeholder="Maharashtra (27)">
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="biz-phone">Phone</label>
+              <input type="text" id="biz-phone" placeholder="+91 98200 11223">
+            </div>
+            <div class="field">
+              <label for="biz-email">Email</label>
+              <input type="email" id="biz-email" placeholder="billing@quickbill.in">
+            </div>
+          </div>
+          <div class="field">
+            <label for="biz-address">Registered Address</label>
+            <textarea id="biz-address" rows="2" placeholder="402 Maker Chambers V, Nariman Point, Mumbai 400021"></textarea>
+          </div>
+        </section>
+
+        <section class="studio-card">
+          <div class="card-head">
+            <h2>Client Billing Details</h2>
+            <span class="card-hint">Billed To Block</span>
+          </div>
+
+          <div class="field">
+            <label for="saved-clients-select">Quick-Load Saved Client</label>
+            <select id="saved-clients-select">
+              <option value="">-- Select a saved client --</option>
+            </select>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="cust-gstin">Customer GSTIN</label>
+              <input type="text" id="cust-gstin" placeholder="29AABCU9603R1ZM" maxlength="15">
+            </div>
+            <div class="field">
+              <label for="cust-state">Place of Supply</label>
+              <input type="text" id="cust-state" placeholder="Karnataka (29)">
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="cust-phone">Customer Phone</label>
+              <input type="text" id="cust-phone" placeholder="+91 98450 22334">
+            </div>
+            <div class="field">
+              <label for="cust-email">Customer Email</label>
+              <input type="email" id="cust-email" placeholder="accounts@client.in">
+            </div>
+          </div>
+          <div class="field">
+            <label for="cust-address">Billing Address</label>
+            <textarea id="cust-address" rows="2" placeholder="12th Main, Indiranagar, Bengaluru 560038"></textarea>
+          </div>
+        </section>
+
+        <section class="studio-card">
+          <div class="card-head">
+            <h2>GST &amp; Currency Engine</h2>
+            <span class="card-hint">18% Standard Default</span>
+          </div>
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="tax-mode">GST Breakdown Mode</label>
+              <select id="tax-mode">
+                <option value="flat" selected>Standard GST</option>
+                <option value="cgst_sgst">CGST + SGST (Intra-State)</option>
+                <option value="igst">IGST (Inter-State)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="tax-rate">GST Rate (%)</label>
+              <select id="tax-rate">
+                <option value="18" selected>18% (Standard)</option>
+                <option value="12">12%</option>
+                <option value="5">5%</option>
+                <option value="28">28%</option>
+                <option value="0">0% (Exempt / Export)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="currency-code">Invoice Currency</label>
+            <select id="currency-code">
+              <option value="INR" selected>₹ INR — Indian Rupee</option>
+              <option value="USD">$ USD — US Dollar</option>
+              <option value="EUR">€ EUR — Euro</option>
+              <option value="GBP">£ GBP — British Pound</option>
+            </select>
+          </div>
+        </section>
+      </div>
+
+      <!-- TAB 3: UPI QR, BANK, DIGITAL SIGNATURE & NOTES -->
+      <div id="tab-payment" class="studio-panel" role="tabpanel" hidden>
+        <section class="studio-card">
+          <div class="card-head">
+            <h2>Instant UPI Payment QR</h2>
+            <span class="card-hint">100% Offline Generator</span>
+          </div>
+
+          <label class="checkbox-pill" for="qr-enabled">
+            <input type="checkbox" id="qr-enabled" checked>
+            <span>Embed Dynamic UPI QR on Invoice</span>
+          </label>
+
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="upi-id">UPI VPA / ID</label>
+              <input type="text" id="upi-id" placeholder="quickbill@okaxis">
+            </div>
+            <div class="field">
+              <label for="upi-payee">Payee Display Name</label>
+              <input type="text" id="upi-payee" placeholder="QuickBill Studio">
+            </div>
+          </div>
+        </section>
+
+        <section class="studio-card">
+          <div class="card-head">
+            <h2>Bank Transfer Details</h2>
+            <span class="card-hint">NEFT / RTGS / IMPS</span>
+          </div>
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="bank-name">Bank Name</label>
+              <input type="text" id="bank-name" placeholder="HDFC Bank">
+            </div>
+            <div class="field">
+              <label for="bank-ifsc">IFSC Code</label>
+              <input type="text" id="bank-ifsc" placeholder="HDFC0000240">
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="bank-acc">Account Number</label>
+              <input type="text" id="bank-acc" placeholder="50200048192031">
+            </div>
+            <div class="field">
+              <label for="bank-branch">Branch</label>
+              <input type="text" id="bank-branch" placeholder="Nariman Point, Mumbai">
+            </div>
+          </div>
+        </section>
+
+        <section class="studio-card">
+          <div class="card-head">
+            <h2>Authorized Signature</h2>
+            <span class="card-hint">Draw or Upload</span>
+          </div>
+          <div class="logo-uploader-row">
+            <button type="button" id="btn-open-sig-pad" class="btn btn-primary btn-sm">Draw Signature</button>
+            <input type="file" id="sig-file-input" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden>
+            <button type="button" id="btn-upload-sig" class="btn btn-secondary btn-sm">Upload Image</button>
+            <button type="button" id="btn-clear-sig" class="btn btn-ghost btn-sm">Clear</button>
+          </div>
+          <div class="field">
+            <label for="signatory-name">Signatory Name / Designation</label>
+            <input type="text" id="signatory-name" placeholder="Authorized Signatory">
+          </div>
+        </section>
+
+        <section class="studio-card">
+          <div class="card-head">
+            <h2>Notes &amp; Terms</h2>
+            <span class="card-hint">Footer Clauses</span>
+          </div>
+          <div class="field">
+            <label for="doc-notes">Invoice Notes</label>
+            <textarea id="doc-notes" rows="2" placeholder="Thank you for your business. Please quote the invoice number on wire transfers."></textarea>
+          </div>
+          <div class="field">
+            <label for="doc-terms">Terms &amp; Conditions</label>
+            <textarea id="doc-terms" rows="3" placeholder="1. Payment due within agreed credit period.&#10;2. Subject to Mumbai jurisdiction."></textarea>
+          </div>
+        </section>
+      </div>
+
+      <!-- TAB 4: QUICK-ADD SERVICE / PRODUCT CATALOG -->
+      <div id="tab-catalog" class="studio-panel" role="tabpanel" hidden>
+        <section class="studio-card">
+          <div class="card-head">
+            <h2>Service &amp; SKU Catalog</h2>
+            <span class="card-hint">1-Click Insert</span>
+          </div>
+          <div class="field">
+            <input type="search" id="catalog-search" placeholder="Search saved services or HSN codes...">
+          </div>
+          <div id="catalog-list" class="catalog-list"></div>
+        </section>
+
+        <section class="studio-card">
+          <div class="card-head">
+            <h2>Create Catalog Preset</h2>
+            <span class="card-hint">Reusable Item</span>
+          </div>
+          <div class="field">
+            <label for="cat-desc">Item Description</label>
+            <input type="text" id="cat-desc" placeholder="e.g., Monthly Retainer — DevOps">
+          </div>
+          <div class="form-grid-3">
+            <div class="field">
+              <label for="cat-hsn">HSN/SAC</label>
+              <input type="text" id="cat-hsn" placeholder="998313">
+            </div>
+            <div class="field">
+              <label for="cat-unit">Unit</label>
+              <input type="text" id="cat-unit" value="nos">
+            </div>
+            <div class="field">
+              <label for="cat-price">Rate (₹)</label>
+              <input type="number" id="cat-price" min="1" step="any" placeholder="5000">
+            </div>
+          </div>
+          <button type="button" id="btn-add-catalog" class="btn btn-secondary btn-block">+ Save to Catalog</button>
+        </section>
+      </div>
+    </aside>
+
+    <!-- Right Stage: Live A4 Printable Document -->
+    <section class="document-stage" aria-label="Live Invoice Document">
+      <!-- Stage Controls (Hidden in Print) -->
+      <div class="stage-toolbar">
+        <div class="accent-picker" role="group" aria-label="Document Accent Color">
+          <span class="toolbar-label">Paper Accent</span>
+          <button type="button" class="accent-swatch is-active" data-doc-accent="theme" title="Match Workspace Theme">Auto</button>
+          <button type="button" class="accent-swatch swatch-cobalt" data-doc-accent="cobalt" title="Classic Cobalt"></button>
+          <button type="button" class="accent-swatch swatch-ink" data-doc-accent="ink" title="Architectural Ink"></button>
+          <button type="button" class="accent-swatch swatch-emerald" data-doc-accent="emerald" title="Reserve Emerald"></button>
+          <button type="button" class="accent-swatch swatch-burgundy" data-doc-accent="burgundy" title="Oxblood Burgundy"></button>
+          <button type="button" class="accent-swatch swatch-amber" data-doc-accent="amber" title="Brushed Brass"></button>
+        </div>
+
+        <div class="stage-right-tools">
+          <button type="button" id="btn-toggle-density" class="btn btn-ghost btn-sm">Compact Rows</button>
+          <button type="button" id="btn-copy-summary" class="btn btn-ghost btn-sm">Copy Summary</button>
+          <button type="button" id="btn-preview-mode" class="btn btn-secondary btn-sm">Focus A4 View</button>
         </div>
       </div>
+
+      <button type="button" id="btn-exit-preview" class="btn btn-primary exit-preview-fab" hidden>
+        Exit Focus View
+      </button>
+
+      <!-- Printable A4 Sheet -->
+      <article id="invoice-sheet" class="a4-sheet" data-doc-accent="theme">
+        <div id="doc-watermark" class="doc-watermark" aria-hidden="true"></div>
+
+        <!-- Document Header -->
+        <header class="doc-header">
+          <div class="doc-seller">
+            <div id="pv-logo-wrap" class="doc-logo-wrap"></div>
+            <div class="doc-seller-info">
+              <h1 id="pv-biz-name" class="doc-biz-name">QuickBill Digital Studio</h1>
+              <p id="pv-biz-tagline" class="doc-biz-tagline">Product Design &amp; Engineering Consultancy</p>
+              <p id="pv-biz-address" class="doc-biz-meta">402 Maker Chambers V, Nariman Point, Mumbai 400021</p>
+              <p id="pv-biz-contact" class="doc-biz-meta">+91 98200 11223 · billing@quickbill.in</p>
+              <p id="pv-biz-gstin" class="doc-biz-gstin">GSTIN: 27AAACQ1234F1Z5</p>
+            </div>
+          </div>
+
+          <div class="doc-meta-box">
+            <div id="pv-doc-title" class="doc-title-badge">TAX INVOICE</div>
+            <dl class="doc-meta-grid">
+              <div>
+                <dt>Invoice No.</dt>
+                <dd id="pv-inv-number" class="mono-strong">QB-2026-0001</dd>
+              </div>
+              <div>
+                <dt>Invoice Date</dt>
+                <dd id="pv-inv-date">—</dd>
+              </div>
+              <div>
+                <dt>Due Date</dt>
+                <dd id="pv-due-date">—</dd>
+              </div>
+              <div>
+                <dt>Terms</dt>
+                <dd id="pv-terms">Net 15 Days</dd>
+              </div>
+            </dl>
+          </div>
+        </header>
+
+        <!-- Parties & Supply Details -->
+        <section class="doc-parties-grid">
+          <div class="party-card">
+            <span class="party-eyebrow">Billed To</span>
+            <h2 id="pv-cust-name" class="party-name">Walk-In / Cash Customer</h2>
+            <p id="pv-cust-address" class="party-detail"></p>
+            <p id="pv-cust-contact" class="party-detail"></p>
+            <p id="pv-cust-gstin" class="party-gstin"></p>
+          </div>
+
+          <div class="party-card party-card-summary">
+            <span class="party-eyebrow">Supply &amp; Settlement</span>
+            <div class="supply-kv-list">
+              <div class="supply-kv">
+                <span>Place of Supply</span>
+                <strong id="pv-supply-state">Maharashtra (27)</strong>
+              </div>
+              <div class="supply-kv">
+                <span>Currency</span>
+                <strong id="pv-currency-label">INR (₹)</strong>
+              </div>
+              <div class="supply-kv">
+                <span>Document Status</span>
+                <strong id="pv-status-label">Active</strong>
+              </div>
+              <div class="supply-kv supply-kv-due">
+                <span>Total Payable</span>
+                <strong id="pv-hero-due">₹0.00</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Dynamic Line-Items Table -->
+        <section class="doc-table-wrap">
+          <table id="invoice-table" class="invoice-table">
+            <thead>
+              <tr>
+                <th class="col-idx">#</th>
+                <th class="col-desc">Item Description</th>
+                <th class="col-qty">Quantity</th>
+                <th class="col-price">Unit Price</th>
+                <th class="col-total">Line Total</th>
+                <th class="col-actions">Action</th>
+              </tr>
+            </thead>
+            <tbody id="invoice-tbody">
+              <!-- Rendered dynamically by script.js -->
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Lower Financial Split: Words / Payment QR / Totals -->
+        <section class="payment-lower-grid">
+          <div class="payment-left-col">
+            <div class="words-box">
+              <span class="section-cap">Amount Chargeable (in Words)</span>
+              <p id="pv-amount-words" class="words-value">Rupees Zero Only</p>
+            </div>
+
+            <div id="pv-payment-box" class="payment-info-card">
+              <div id="pv-qr-wrap" class="qr-card" hidden>
+                <div id="pv-qr-svg" class="qr-svg-host" aria-label="UPI Payment QR Code"></div>
+                <div class="qr-caption">
+                  <span class="qr-badge">SCAN &amp; PAY UPI</span>
+                  <strong id="pv-upi-caption"></strong>
+                </div>
+              </div>
+              <div id="pv-bank-details" class="bank-details-box"></div>
+            </div>
+
+            <div id="pv-notes-wrap" class="notes-box" hidden>
+              <span class="section-cap">Notes</span>
+              <p id="pv-notes-text"></p>
+            </div>
+          </div>
+
+          <!-- Automated Tax & Total Calculation Engine Output -->
+          <div class="totals-ledger">
+            <div class="ledger-row">
+              <span>Subtotal</span>
+              <strong id="sum-subtotal">₹0.00</strong>
+            </div>
+
+            <div id="row-discount" class="ledger-row ledger-discount" hidden>
+              <span id="sum-discount-label">Discount</span>
+              <strong id="sum-discount">−₹0.00</strong>
+            </div>
+
+            <div id="tax-rows-container" class="tax-rows-container">
+              <div class="ledger-row">
+                <span>GST (18%)</span>
+                <strong id="sum-gst">₹0.00</strong>
+              </div>
+            </div>
+
+            <div id="row-shipping" class="ledger-row" hidden>
+              <span>Shipping / Misc</span>
+              <strong id="sum-shipping">₹0.00</strong>
+            </div>
+
+            <div id="row-roundoff" class="ledger-row" hidden>
+              <span>Round-Off</span>
+              <strong id="sum-roundoff">₹0.00</strong>
+            </div>
+
+            <div class="ledger-row ledger-grand">
+              <span>Grand Total</span>
+              <strong id="sum-grand-total">₹0.00</strong>
+            </div>
+
+            <div id="row-paid" class="ledger-row ledger-paid" hidden>
+              <span>Amount Paid</span>
+              <strong id="sum-paid">−₹0.00</strong>
+            </div>
+
+            <div id="row-balance" class="ledger-row ledger-balance" hidden>
+              <span>Balance Due</span>
+              <strong id="sum-balance">₹0.00</strong>
+            </div>
+          </div>
+        </section>
+
+        <!-- Document Footer & Signatory -->
+        <footer class="doc-footer">
+          <div class="doc-terms-col">
+            <span class="section-cap">Terms &amp; Conditions</span>
+            <p id="pv-terms-text" class="terms-body"></p>
+          </div>
+          <div class="doc-signatory-col">
+            <span id="pv-for-biz" class="sig-for">For QuickBill Digital Studio</span>
+            <div id="pv-sig-img-wrap" class="sig-img-wrap"></div>
+            <div class="sig-line"></div>
+            <span id="pv-signatory-name" class="sig-name">Authorized Signatory</span>
+          </div>
+        </footer>
+      </article>
     </section>
-
-    <!-- Main Invoice Document Card -->
-    <article class="invoice-card" id="invoice-card">
-      <!-- Invoice Header -->
-      <header class="invoice-header">
-        <div class="company-block">
-          <h1>INVOICE</h1>
-          <p class="company-sub">Official Tax Receipt & Billing Summary</p>
-        </div>
-        <div class="status-badge">TAX INVOICE</div>
-      </header>
-
-      <!-- Customer & Invoice Metadata Fields -->
-      <section class="metadata-grid" aria-label="Customer and invoice details">
-        <div class="field-group">
-          <label for="customer-name">Customer Name</label>
-          <input 
-            type="text" 
-            id="customer-name" 
-            placeholder="e.g., Acme Corp / Rahul Nair" 
-            autocomplete="off"
-          >
-        </div>
-        <div class="field-group">
-          <label for="invoice-date">Invoice Date</label>
-          <input type="date" id="invoice-date">
-        </div>
-        <div class="field-group">
-          <label for="invoice-number">Invoice #</label>
-          <input 
-            type="text" 
-            id="invoice-number" 
-            placeholder="INV-2026-001" 
-            autocomplete="off"
-          >
-        </div>
-      </section>
-
-      <!-- Item Addition Form (Hidden on Print) -->
-      <form id="item-form" class="input-form no-print" novalidate>
-        <div class="form-row">
-          <div class="field-group flex-grow">
-            <label for="item-name">Item Description</label>
-            <input 
-              type="text" 
-              id="item-name" 
-              placeholder="e.g., Full-Stack UI Architecture" 
-              required
-              autocomplete="off"
-            >
-          </div>
-          <div class="field-group field-sm">
-            <label for="item-qty">Quantity</label>
-            <input 
-              type="number" 
-              id="item-qty" 
-              placeholder="1" 
-              min="0.01" 
-              step="any" 
-              required
-            >
-          </div>
-          <div class="field-group field-md">
-            <label for="item-price">Unit Price ($)</label>
-            <input 
-              type="number" 
-              id="item-price" 
-              placeholder="0.00" 
-              min="0.01" 
-              step="any" 
-              required
-            >
-          </div>
-          <div class="field-group field-btn">
-            <button type="submit" id="add-item-btn" class="btn-add">
-              + Add Item
-            </button>
-          </div>
-        </div>
-        <p id="form-error" class="form-error" role="alert" aria-live="polite"></p>
-      </form>
-
-      <!-- Dynamic Line Items Table -->
-      <section class="table-container" aria-label="Invoice Line Items">
-        <table class="invoice-table">
-          <thead>
-            <tr>
-              <th class="col-index">#</th>
-              <th class="col-desc">Item Description</th>
-              <th class="col-qty num-col">Qty</th>
-              <th class="col-price num-col">Unit Price</th>
-              <th class="col-total num-col">Line Total</th>
-              <th class="col-action delete-col no-print">Action</th>
-            </tr>
-          </thead>
-          <tbody id="invoice-tbody">
-            <!-- Dynamically populated by script.js from the items[] array -->
-          </tbody>
-        </table>
-        <div id="empty-state" class="empty-state">
-          No items added to this invoice yet. Use the form above to add billable items.
-        </div>
-      </section>
-
-      <!-- Summary & Reduction Math Footer -->
-      <footer class="invoice-footer">
-        <div class="invoice-notes">
-          <p class="notes-title">Payment Terms & Notes</p>
-          <p class="notes-body">Thank you for your business. All amounts are calculated dynamically with standard 18% GST/Tax applied.</p>
-        </div>
-
-        <div class="totals-panel">
-          <div class="totals-row">
-            <span>Subtotal</span>
-            <span id="subtotal-amount" class="currency-badge">$0.00</span>
-          </div>
-          <div class="totals-row">
-            <span>Tax (18% GST)</span>
-            <span id="tax-amount" class="currency-badge">$0.00</span>
-          </div>
-          <div class="totals-row grand-total-row">
-            <span>Grand Total</span>
-            <span id="grand-total" class="currency-badge grand-badge">$0.00</span>
-          </div>
-        </div>
-      </footer>
-
-      <!-- Action Buttons (Hidden on Print) -->
-      <div class="action-btns no-print">
-        <button type="button" id="clear-btn" class="btn-secondary">
-          Clear All
-        </button>
-        <button type="button" id="print-btn" class="btn-primary">
-          Print Invoice / Save PDF
-        </button>
-      </div>
-    </article>
   </main>
+
+  <!-- Slide-over Vault Drawer (Saved Invoices & Clients) -->
+  <div id="vault-backdrop" class="drawer-backdrop" hidden></div>
+  <aside id="vault-drawer" class="vault-drawer" aria-label="Invoice Vault and Clients" hidden>
+    <div class="drawer-head">
+      <div>
+        <h2>Invoice &amp; Client Vault</h2>
+        <p class="drawer-sub">Local browser ledger · Instant load &amp; status tracking</p>
+      </div>
+      <button type="button" id="btn-close-vault" class="btn btn-ghost btn-sm" aria-label="Close Vault">Close</button>
+    </div>
+
+    <div class="drawer-controls">
+      <input type="search" id="vault-search" placeholder="Search by Invoice # or Customer name...">
+      <div class="vault-filters" role="group" aria-label="Filter Invoices">
+        <button type="button" class="vault-filter-btn is-active" data-filter="ALL">All</button>
+        <button type="button" class="vault-filter-btn" data-filter="DRAFT">Draft</button>
+        <button type="button" class="vault-filter-btn" data-filter="SENT">Sent</button>
+        <button type="button" class="vault-filter-btn" data-filter="PAID">Paid</button>
+        <button type="button" class="vault-filter-btn" data-filter="OVERDUE">Overdue</button>
+      </div>
+    </div>
+
+    <div class="drawer-scroll">
+      <div class="drawer-section-title">Saved Invoices</div>
+      <div id="vault-list" class="vault-list"></div>
+
+      <div class="drawer-section-title">Saved Client Directory</div>
+      <div id="vault-clients-list" class="vault-list"></div>
+    </div>
+  </aside>
+
+  <!-- Interactive Digital Signature Pad Modal -->
+  <div id="sig-backdrop" class="modal-backdrop" hidden>
+    <div id="sig-modal" class="modal-card" role="dialog" aria-modal="true" aria-labelledby="sig-modal-title">
+      <div class="modal-head">
+        <h2 id="sig-modal-title">Draw Authorized Signature</h2>
+        <p>Sign smoothly inside the pad below using mouse, trackpad, or touch.</p>
+      </div>
+      <div class="sig-canvas-wrap">
+        <canvas id="sig-canvas" width="520" height="170"></canvas>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="btn-sig-clear" class="btn btn-ghost">Clear Pad</button>
+        <div class="modal-actions-right">
+          <button type="button" id="btn-sig-cancel" class="btn btn-secondary">Cancel</button>
+          <button type="button" id="btn-sig-save" class="btn btn-primary">Apply Signature</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Non-blocking Toast Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
   <script src="script.js"></script>
 </body>
